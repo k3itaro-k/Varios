@@ -22,32 +22,8 @@ def Compare2DF(dir_df1,dir_df2):
     col_df2 = list(df2.columns)
     if len(col_df1) == len(col_df2):
         if col_df1 == col_df2:
-            index_df1 = df1.shape[0]  
-            index_df2 = df2.shape[0]
-            df_i = pd.DataFrame(columns=list(df1.columns))
-            list_j = list(range(index_df2))
-            for i in range(index_df1):
-                bol = []
-                # Se inicia bol_i en False, cambiara a True, si row i != row j
-                bol_i = False                    
-                for j in list_j:
-                    bol = df1.loc[i,:] == df2.loc[j,:]         
-                    bol_unique = bol.unique()
-                    if len(bol_unique) == 1:
-                        if bol_unique:
-                            # i == j
-                            # Eliminamos la row j y el valor j de la list_j
-                            # Salimos del ciclo de comparación j
-                            df2.drop(j,inplace=True)
-                            list_j.remove(j)
-                            bol_i=True
-                            break
-                        else:
-                            bol_i = False
-                    else:
-                        bol_i = False
-                if not bol_i:
-                    df_i = df_i.append(df1.loc[i,:])
+            df_l = pd.merge(df1, df2, how='outer',indicator=True).query('_merge == "left_only"').drop(columns=['_merge'])
+            df_r = pd.merge(df1, df2, how='outer',indicator=True).query('_merge == "right_only"').drop(columns=['_merge'])
         else:
             for col in col_df1:
                 if col in col_df2:
@@ -57,15 +33,15 @@ def Compare2DF(dir_df1,dir_df2):
             print('El orden de las columnas no es identico.')
     else:
         print('Los archivos no tienen el mismo numero de columnas.')
-    if df_i.empty:
+    if df_l.empty:
         print('Todas las filas de df1 se encontraron en df2.')
     else:
-        df_i.to_csv('df1.txt', ',')
+        df_l.to_csv('df1.txt', ',')
         print('Se ha guardado un archivos con las filas de df1 que no se encontraron en df2.')
-    if df2.empty:
+    if df_r.empty:
         print('Todas las filas  de df2 se encontraron en df1.')
     else:
-        df2.to_csv('df2.txt', sep=',')
+        df_r.to_csv('df2.txt', sep=',')
         print('Se ha guardado un archivo con las filas de df2 que no se encontraron en df1.')
      
 if __name__=='__main__':
