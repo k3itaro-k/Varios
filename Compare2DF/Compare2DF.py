@@ -11,7 +11,8 @@ import os
 
 import pandas as pd
 
-def Compare2DF(dir_df1,dir_df2):
+
+def Compare2DF(dir_df1, dir_df2):
     # dir_df1 ubicación del archivo df1.
     # dir_df2 ubicación del archivo df2.
 
@@ -34,7 +35,7 @@ def Compare2DF(dir_df1,dir_df2):
             df_l.index += 1
             df_l = df_l.reset_index()
             df_l['index'] = 'Row: ' + df_l['index'].astype(str)
-            df_r = pd.merge(df2, df1, how='outer',indicator=True).query('_merge == "right_only"').drop(columns=['_merge'])
+            df_r = pd.merge(df2, df1, how='outer',indicator=True).query('_merge == "left_only"').drop(columns=['_merge'])
             df_r.index += 1
             df_r = df_r.reset_index()
             df_r['index'] = 'Row: ' + df_r['index'].astype(str)
@@ -50,18 +51,18 @@ def Compare2DF(dir_df1,dir_df2):
     if df_l.empty:
         print('Todas las filas de df1 se encontraron en df2.')
     else:
-        df_l.to_csv('df1.txt', sep=separ, header=head_out)
+        df_l.to_csv('df1.txt', sep=separ, header=head_out, index=False)
         print('Se ha guardado un archivos con las filas de df1 que no se encontraron en df2.')
     if df_r.empty:
         print('Todas las filas  de df2 se encontraron en df1.')
     else:
-        df_r.to_csv('df2.txt', sep=separ, header=head_out)
+        df_r.to_csv('df2.txt', sep=separ, header=head_out, index=False)
         print('Se ha guardado un archivo con las filas de df2 que no se encontraron en df1.')
 
 
 if __name__=='__main__':
     header_ = True
-    separ = ','
+    separ = '|'
     dir_df1 = 'PATH'
     dir_df2 = 'PATH'
     Compare2DF(dir_df1, dir_df2)
